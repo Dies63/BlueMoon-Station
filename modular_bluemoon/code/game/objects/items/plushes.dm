@@ -753,7 +753,6 @@
 	desc = "Тот самый пернатый ублюдок, которого все ненавидят, но только не вы."
 	icon_state = "vox"
 	squeak_override = list('modular_splurt/sound/voice/shriek1.ogg' = 1)
-	can_you_fuck_plush = FALSE
 
 /obj/item/toy/plush/bm/oldman
 	name = "Old Man plushie"
