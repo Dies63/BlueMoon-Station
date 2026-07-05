@@ -4,7 +4,6 @@
 	write_log_user = "trying to tear off"
 	write_log_target = "was tearing off"
 	required_from_target = INTERACTION_REQUIRE_HANDS
-	var/list/hidden_additional = list("тихо ", "незаметно ")
 
 /datum/interaction/lewd/tear_of_clothing/display_interaction(mob/living/user, mob/living/partner, is_hidden)
 	var/mob/living/carbon/human/partner_human = astype(partner, /mob/living/carbon/human)
