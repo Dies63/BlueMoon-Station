@@ -890,8 +890,8 @@ GLOBAL_LIST_EMPTY(ashwalker_spawns)
 	name = "Ghost Cafe Robot Spawner"
 	desc = "A robotic shell for ghost cafe visitors."
 	mob_name = "a ghost cafe robot"
-	icon = 'icons/obj/machines/sleeper.dmi'
-	icon_state = "sleeper"
+	icon = 'modular_sand/icons/obj/machines/robot_storage.dmi'
+	icon_state = "robostorage"
 	mob_type = /mob/living/silicon/robot
 	roundstart = FALSE
 	death = FALSE
