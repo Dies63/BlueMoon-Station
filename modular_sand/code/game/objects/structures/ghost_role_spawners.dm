@@ -886,6 +886,23 @@ GLOBAL_LIST_EMPTY(ashwalker_spawns)
 /obj/effect/mob_spawn/human/pirate/gunner
 	rank = "Gunner"
 
+/obj/effect/mob_spawn/robot/ghostcafe
+	name = "Ghost Cafe Robot Spawner"
+	desc = "A robotic shell for ghost cafe visitors."
+	mob_name = "a ghost cafe robot"
+	icon = 'icons/obj/machines/sleeper.dmi'
+	icon_state = "sleeper"
+	mob_type = /mob/living/silicon/robot
+	roundstart = FALSE
+	death = FALSE
+	anchored = TRUE
+	density = FALSE
+	uses = -1
+	short_desc = "Вы - робот-посетитель Призрачного Кафе!"
+	flavour_text = "Вы - синтетическое существо, прибывшее в Ghost Cafe для отдыха. Наслаждайтесь общением с другими посетителями!"
+	assignedrole = "Ghost Cafe Robot"
+	can_load_appearance = FALSE
+
 /obj/effect/mob_spawn/human/ghostcafe
 	name = "Ghost Cafe Sleeper"
 	uses = -1
