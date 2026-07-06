@@ -43,11 +43,11 @@
 		return
 
 	// А теперь уже применяем повреждения
-	var/damage_amount = rand(1, 3)
+	var/damage_amount = rand(1, 1)
 	var/lust_amount = NORMAL_LUST
 
 	// Повреждаем униформу (добавьте этот прок в одежду)
-	target_uniform.take_damage(50, BRUTE, MELEE, 0) // Или другой метод
+	target_uniform.take_damage(150, BRUTE, MELEE, 0) // Или другой метод
 
 	var/message = "[is_hidden ? picked_hidden : null]<b>[user]</b> рвёт униформу <b>[partner_human]</b> при помощи своего [item_in_hand.name]."
 	if (user.a_intent == INTENT_HARM)
