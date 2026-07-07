@@ -128,6 +128,7 @@
 	desc = "A simple powered hand drill. It's fitted with a screw bit."
 	icon_state = "drill_screw"
 	item_state = "drill"
+	slot_flags = ITEM_SLOT_BELT
 	lefthand_file = 'modular_sand/icons/mob/inhands/equipment/tools_lefthand.dmi'
 	righthand_file = 'modular_sand/icons/mob/inhands/equipment/tools_righthand.dmi'
 	custom_materials = list(/datum/material/iron=150,/datum/material/silver=50,/datum/material/titanium=25) //done for balance reasons, making them high value for research, but harder to get
