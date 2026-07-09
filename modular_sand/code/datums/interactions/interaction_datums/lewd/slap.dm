@@ -29,7 +29,6 @@
 		span_userlove("Вы издаёте стон от шлепка по вашим булкам грома!"),
 		span_italics("Вы слышите чувственный стон...")
 	)
-		playsound(get_turf(target), 'sound/weapons/slap.ogg', 50, TRUE, -1)
 
 //BLUEMOON ADD END
 
