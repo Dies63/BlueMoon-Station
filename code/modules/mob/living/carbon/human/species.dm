@@ -2043,6 +2043,7 @@ GLOBAL_LIST_EMPTY(roundstart_race_names)
 					SEND_SIGNAL(target, COMSIG_ADD_MOOD_EVENT, "ass", /datum/mood_event/butt_slapped)
 					playsound(target.loc, 'sound/weapons/slap.ogg', 50, FALSE, -1) // deep bassy butt
 					target.adjustStaminaLoss(25)
+					target.emote("moan")
 					user.visible_message(
 						span_notice("[user] шлёпает по сочной заднице [target]!"),
 						target = target,
