@@ -13,6 +13,9 @@
 //BLUEMOON ADD перенос из /datum/interaction/lewd/display_interaction
 /datum/interaction/lewd/slap/display_interaction(mob/living/user, mob/living/target, is_hidden)
 	. = ..()
+
+	playsound(get_turf(target), 'sound/weapons/slap.ogg', 50, TRUE, -1)
+
 	if(iscatperson(target))
 		target.emote(pick("nya","meow")) //W-what are you doing S-senpai? >///<
 
@@ -20,6 +23,14 @@
 		if(prob(50))
 			target.visible_message("<span class='lewd'>Задница <b>[target]</b> смешно хонкает!</span>")
 		playlewdinteractionsound(get_turf(target), 'sound/items/bikehorn.ogg', 40, 1, -1)
+
+	if(HAS_TRAIT(target, TRAIT_JIGGLY_ASS))
+		target.emote("moan")
+		target.visible_message(
+		span_lewd("[target] издаёт глубокий стон от шлепка по [target.ru_ego()] пышной заднице!"),
+		span_userlove("Вы издаёте стон от шлепка по вашим булкам грома!"),
+		span_italics("Вы слышите чувственный стон...")
+	)
 //BLUEMOON ADD END
 
 /datum/interaction/lewd/grope_ass
