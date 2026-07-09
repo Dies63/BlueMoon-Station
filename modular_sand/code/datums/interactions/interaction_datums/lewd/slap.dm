@@ -14,8 +14,6 @@
 /datum/interaction/lewd/slap/display_interaction(mob/living/user, mob/living/target, is_hidden)
 	. = ..()
 
-	playsound(get_turf(target), 'sound/weapons/slap.ogg', 50, TRUE, -1)
-
 	if(iscatperson(target))
 		target.emote(pick("nya","meow")) //W-what are you doing S-senpai? >///<
 
@@ -31,6 +29,8 @@
 		span_userlove("Вы издаёте стон от шлепка по вашим булкам грома!"),
 		span_italics("Вы слышите чувственный стон...")
 	)
+		playsound(get_turf(target), 'sound/weapons/slap.ogg', 50, TRUE, -1)
+
 //BLUEMOON ADD END
 
 /datum/interaction/lewd/grope_ass
