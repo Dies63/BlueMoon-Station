@@ -26,6 +26,10 @@
 	return ..()
 
 /datum/component/aperture_turret_skin/proc/setup_turret(obj/machinery/porta_turret/turret)
+	// ★★★ ПРОВЕРКА Z-УРОВНЯ ★★★
+	if(!is_station_level(turret.z))
+		return
+
 	turret.name = "Sentry Turret"
 	turret.desc = "An Aperture Science security turret. It watches you with suspicious enthusiasm."
 	turret.icon = APERTURE_TURRET_ICON
@@ -50,6 +54,10 @@
 	turret.update_icon()
 
 /datum/component/aperture_turret_skin/proc/get_icon_state(obj/machinery/porta_turret/turret)
+	// ★★★ ПРОВЕРКА Z-УРОВНЯ ★★★
+	if(!is_station_level(turret.z))
+		return "off"
+
 	if(!turret.anchored)
 		return "off"
 	if(turret.machine_stat & BROKEN)
@@ -67,6 +75,13 @@
 	if(!(updates & UPDATE_ICON_STATE))
 		return
 	var/obj/machinery/porta_turret/turret = parent
+
+	// ★★★ ПРОВЕРКА Z-УРОВНЯ ★★★
+	if(!is_station_level(turret.z))
+		turret.icon = initial(turret.icon)
+		turret.icon_state = initial(turret.icon_state)
+		return COMSIG_ATOM_NO_UPDATE_ICON_STATE
+
 	turret.icon = APERTURE_TURRET_ICON
 	turret.icon_state = get_icon_state(turret)
 	return COMSIG_ATOM_NO_UPDATE_ICON_STATE
@@ -74,6 +89,11 @@
 /datum/component/aperture_turret_skin/proc/on_break(datum/source, damage_flag)
 	SIGNAL_HANDLER
 	var/obj/machinery/porta_turret/turret = parent
+
+	// ★★★ ПРОВЕРКА Z-УРОВНЯ ★★★
+	if(!is_station_level(turret.z))
+		return
+
 	playsound(turret, 'modular_bluemoon/portal/sound/Звуки турелей/Гибель.ogg', 90, TRUE)
 	for(var/obj/machinery/porta_turret/nearby in view(7, turret))
 		if(nearby == turret || !nearby.GetComponent(/datum/component/aperture_turret_skin))
@@ -85,6 +105,10 @@
 	var/obj/machinery/porta_turret/turret = parent
 	if(QDELETED(turret))
 		return PROCESS_KILL
+
+	// ★★★ ПРОВЕРКА Z-УРОВНЯ ★★★
+	if(!is_station_level(turret.z))
+		return
 
 	if(turret.invisibility)
 		turret.invisibility = 0
@@ -130,8 +154,13 @@
 /obj/machinery/porta_turret/update_icon_state()
 	var/datum/component/aperture_turret_skin/skin = GetComponent(/datum/component/aperture_turret_skin)
 	if(skin)
-		icon = APERTURE_TURRET_ICON
-		icon_state = skin.get_icon_state(src)
+		// ★★★ ПРОВЕРКА Z-УРОВНЯ ★★★
+		if(is_station_level(z))
+			icon = APERTURE_TURRET_ICON
+			icon_state = skin.get_icon_state(src)
+		else
+			icon = initial(icon)
+			icon_state = initial(icon_state)
 		return
 	return ..()
 
@@ -140,13 +169,18 @@
 		return
 	if(core.state < GLASS_CORE)
 		return
+	// ★★★ ПРОВЕРКА Z-УРОВНЯ ★★★
+	if(!is_station_level(core.z))
+		return
 	core.icon = APERTURE_GLADOS_ICON
 	core.icon_state = APERTURE_GLADOS_ICON_WIGGLE
 	core.update_appearance()
 
 /obj/structure/ai_core/update_icon_state()
 	if(HAS_TRAIT(SSstation, STATION_TRAIT_APERTURE_SCIENCE) && state >= GLASS_CORE)
-		icon = APERTURE_GLADOS_ICON
-		icon_state = APERTURE_GLADOS_ICON_WIGGLE
-		return
+		// ★★★ ПРОВЕРКА Z-УРОВНЯ ★★★
+		if(is_station_level(z))
+			icon = APERTURE_GLADOS_ICON
+			icon_state = APERTURE_GLADOS_ICON_WIGGLE
+			return
 	return ..()
