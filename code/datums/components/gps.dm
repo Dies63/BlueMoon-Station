@@ -1,4 +1,4 @@
-///Global GPS_list. All  GPS components get saved in here for easy reference.
+///Global GPS_list. All GPS components get saved in here for easy reference.
 GLOBAL_LIST_EMPTY(GPS_list)
 ///GPS component. Atoms that have this show up on gps. Pretty simple stuff.
 /datum/component/gps
@@ -51,7 +51,8 @@ GLOBAL_LIST_EMPTY(GPS_list)
 ///Called on COMSIG_ITEM_ATTACK_SELF
 /datum/component/gps/item/proc/interact(datum/source, mob/user)
 	if(isliving(user) && HAS_TRAIT(user, TRAIT_CHUNKYFINGERS))
-		balloon_alert(user, "Кнопки слишком маленькие для твоих пальцев!")
+
+		to_chat(user, span_warning("Кнопки слишком маленькие для твоих пальцев!"))
 		return
 	if(user)
 		ui_interact(user)
@@ -94,7 +95,8 @@ GLOBAL_LIST_EMPTY(GPS_list)
 ///Toggles the tracking for the gps
 /datum/component/gps/item/proc/toggletracking(mob/user)
 	if(isliving(user) && HAS_TRAIT(user, TRAIT_CHUNKYFINGERS))
-		balloon_alert(user, "Кнопки слишком маленькие для твоих пальцев!")
+
+		to_chat(user, span_warning("Кнопки слишком маленькие для твоих пальцев!"))
 		return
 	if(!user.canUseTopic(parent, BE_CLOSE))
 		return //user not valid to use gps
@@ -113,7 +115,8 @@ GLOBAL_LIST_EMPTY(GPS_list)
 
 /datum/component/gps/item/ui_interact(mob/user, datum/tgui/ui)
 	if(isliving(user) && HAS_TRAIT(user, TRAIT_CHUNKYFINGERS))
-		balloon_alert(user, "Кнопки слишком маленькие для твоих пальцев!")
+
+		to_chat(user, span_warning("Кнопки слишком маленькие для твоих пальцев!"))
 		return
 	if(emped)
 		to_chat(user, "<span class='hear'>[parent] fizzles weakly.</span>")
@@ -162,7 +165,7 @@ GLOBAL_LIST_EMPTY(GPS_list)
 
 /datum/component/gps/item/ui_act(action, params)
 	if(isliving(usr) && HAS_TRAIT(usr, TRAIT_CHUNKYFINGERS))
-		balloon_alert(usr, "Кнопки слишком маленькие для твоих пальцев!")
+		to_chat(usr, span_warning("Кнопки слишком маленькие для твоих пальцев!"))
 		return
 	if(..())
 		return
