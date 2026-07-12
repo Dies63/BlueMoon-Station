@@ -112,6 +112,5 @@
 		if("switch")
 			trauma.request_voluntary_switch(owner)
 
-
 #undef OWNER
 #undef STRANGER
