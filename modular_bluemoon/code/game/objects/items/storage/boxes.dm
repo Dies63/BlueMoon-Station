@@ -58,6 +58,7 @@
 	new	/obj/item/clothing/accessory/permit/deviant/lust(src)
 	new	/obj/item/clothing/accessory/permit/deviant/agony(src)
 	new	/obj/item/clothing/accessory/permit/deviant/agony(src)
+	new	/obj/item/clothing/accessory/permit/deviant/lust(src)
 
 /obj/item/storage/box/service_permits
 	name = "box of service permits"
@@ -65,6 +66,7 @@
 	illustration = "id"
 
 /obj/item/storage/box/service_permits/PopulateContents()
+	new	/obj/item/clothing/accessory/permit/special/bartender(src)
 	new	/obj/item/clothing/accessory/permit/special/bartender(src)
 	new	/obj/item/clothing/accessory/permit/special/bartender(src)
 	new	/obj/item/clothing/accessory/permit/special/bartender(src)
