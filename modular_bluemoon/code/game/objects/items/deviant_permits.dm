@@ -14,7 +14,7 @@
 	notes = "Носитель имеет право на проведение безвредных для станции ритуалов и аггитирование без страха преследования со стороны службы безопасности."
 
 /obj/item/clothing/accessory/permit/deviant/lust
-	icon_state = "lust_plus"
+	icon_state = "lust_permit"
 	name = "Horny activity permit"
 	desc = "Вещественное одобрение на проведение извращённой~ деятельности"
 	permitted_weapons = "N/A"
