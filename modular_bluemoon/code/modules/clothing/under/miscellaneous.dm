@@ -332,7 +332,7 @@
 	fitted = FEMALE_UNIFORM_TOP
 	can_adjust = FALSE
 
-	/obj/item/clothing/under/bm/hunterhide
+/obj/item/clothing/under/bm/hunterhide
 	name = "Hunter's drips"
 	desc = "Дряхлые обноски"
 	icon_state = "hunterhide_uniform"
