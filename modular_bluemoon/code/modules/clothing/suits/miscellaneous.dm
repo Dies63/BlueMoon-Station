@@ -118,17 +118,6 @@
 	blood_overlay_type = "coat"
 	mutantrace_variation = STYLE_DIGITIGRADE|STYLE_NO_ANTHRO_ICON
 
-/obj/item/clothing/suit/rg_lib
-	name = "Astarte Mark VII Armor"
-	desc = "ЗА ИМПЕРАТОРА!"
-	icon = 'modular_bluemoon/icons/obj/clothing/suit.dmi'
-	mob_overlay_icon = 'modular_bluemoon/icons/mob/clothing/suit.dmi'
-	icon_state = "rg_lib"
-	item_state = "rg_lib"
-	armor = list(melee = 70, bullet = 60, laser = 60, energy = 50, bomb = 50, bio = 50, rad = 50)
-	blood_overlay_type = "coat"
-	mutantrace_variation = STYLE_DIGITIGRADE|STYLE_NO_ANTHRO_ICON
-
 /obj/item/clothing/suit/toggle/male2
 	name = "fancy t'au robe"
 	desc = "Прекрасная одежда из Империи Тау."
@@ -180,28 +169,6 @@
 	icon_state = "genetor"  // или "genetor_follower_hood"
 	body_parts_covered = HEAD
 	flags_inv = HIDEHAIR|HIDEFACE|HIDEEARS
-
-/obj/item/clothing/suit/rg_chap
-	name = "Astarte Mark VII Chempion Armor"
-	desc = "Броня Астартес увешанная регалиями!"
-	icon = 'modular_bluemoon/icons/obj/clothing/suit.dmi'
-	mob_overlay_icon = 'modular_bluemoon/icons/mob/clothing/suit.dmi'
-	icon_state = "rg_chap"
-	item_state = "rg_chap"
-	armor = list(melee = 80, bullet = 70, laser = 60, energy = 50, bomb = 50, bio = 50, rad = 50)
-	blood_overlay_type = "coat"
-	mutantrace_variation = STYLE_DIGITIGRADE|STYLE_NO_ANTHRO_ICON
-
-/obj/item/clothing/suit/um_chap
-	name = "Astarte Mark V Champion Armor"
-	desc = "Броня командира Астартес!"
-	icon = 'modular_bluemoon/icons/obj/clothing/suit.dmi'
-	mob_overlay_icon = 'modular_bluemoon/icons/mob/clothing/suit.dmi'
-	icon_state = "um_chap"
-	item_state = "um_chap"
-	armor = list(melee = 70, bullet = 60, laser = 60, energy = 50, bomb = 50, bio = 50, rad = 50)
-	blood_overlay_type = "coat"
-	mutantrace_variation = STYLE_DIGITIGRADE|STYLE_NO_ANTHRO_ICON
 
 /obj/item/clothing/suit/commissar
 	name = "commissar coat"
