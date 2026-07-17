@@ -151,10 +151,6 @@
 	new /obj/item/clothing/suit/hooded/adept_mech_follower(src)
 	new /obj/item/clothing/suit/hooded/adept_mech_follower(src)
 	new /obj/item/clothing/suit/hooded/adept_mech_follower(src)
-	new /obj/item/clothing/head/helmet/chaplain/adept_mech_hood(src)
-	new /obj/item/clothing/head/helmet/chaplain/adept_mech_follower_hood(src)
-	new /obj/item/clothing/head/helmet/chaplain/adept_mech_follower_hood(src)
-	new /obj/item/clothing/head/helmet/chaplain/adept_mech_follower_hood(src)
 
 /obj/item/clothing/suit/hooded/adept_mech
 	name = "Adeptus Mechanicus fancy robe"
@@ -167,7 +163,7 @@
 	blood_overlay_type = "coat"
 	no_t = TRUE
 	mutantrace_variation = STYLE_DIGITIGRADE|STYLE_NO_ANTHRO_ICON
-	hoodtype = /obj/item/clothing/head/helmet/chaplain/adept_mech_hood
+	hoodtype = /obj/item/clothing/head/hooded/chaplain/adept_mech_hood
 
 /obj/item/clothing/suit/hooded/adept_mech_follower
 	name = "Adeptus Mechanicus follower robe"
@@ -180,9 +176,9 @@
 	no_t = TRUE
 	blood_overlay_type = "coat"
 	mutantrace_variation = STYLE_DIGITIGRADE|STYLE_NO_ANTHRO_ICON
-	hoodtype = /obj/item/clothing/head/helmet/chaplain/adept_mech_follower_hood
+	hoodtype = /obj/item/clothing/head/hooded/chaplain/adept_mech_follower_hood
 
-/obj/item/clothing/head/helmet/chaplain/adept_mech_hood
+/obj/item/clothing/head/hooded/chaplain/adept_mech_hood
 	name = "Adeptus Mechanicus Hood"
 	desc = "Bless Omnissiah in my head."
 	icon = 'modular_bluemoon/icons/obj/clothing/hats.dmi'
@@ -191,7 +187,7 @@
 	body_parts_covered = HEAD
 	flags_inv = HIDEHAIR|HIDEFACE|HIDEEARS
 
-/obj/item/clothing/head/helmet/chaplain/adept_mech_follower_hood
+/obj/item/clothing/head/hooded/chaplain/adept_mech_follower_hood
 	name = "Adeptus Mechanicus Follower Hood"
 	desc = "Bless Omnissiah in my head."
 	icon = 'modular_bluemoon/icons/obj/clothing/hats.dmi'
