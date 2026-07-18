@@ -29,6 +29,17 @@
 	QDEL_NULL(dna)
 	last_mind = null
 	GLOB.carbon_list -= src
+	//unequip при QDELING(моб) пропускается (см. /obj/item/Destroy), поэтому
+	//слот-вары отпускаем вручную - иначе зависший в GC моб пиннит экипировку
+	back = null
+	wear_mask = null
+	wear_neck = null
+	internal = null
+	head = null
+	handcuffed = null
+	legcuffed = null
+	//фантом items-галлюцинации живёт в nullspace и без qdel утёк бы насовсем
+	QDEL_NULL(halitem)
 
 /mob/living/carbon/proc/get_breath_buffer()
 	if(!breath_buffer)
@@ -560,10 +571,12 @@
 			break
 	return TRUE
 
-/mob/living/carbon/proc/spew_organ(power = 5, amt = 1)
+/mob/living/carbon/proc/spew_organ(power = 5, amt = 1, exclude_brain = FALSE)
 	var/list/spillable_organs = list()
 	for(var/A in internal_organs)
 		var/obj/item/organ/O = A
+		if(exclude_brain && istype(O, /obj/item/organ/brain))
+			continue
 		if(!(O.organ_flags & ORGAN_NO_DISMEMBERMENT))
 			spillable_organs += O
 	for(var/i in 1 to amt)
