@@ -758,7 +758,7 @@
 	name = "Expie plushie"
 	desc = "Бедняга, все время получающий по морде, ломающий кости, взрывающийся на мине."
 	icon_state = "expie"
-	squeak_override = list('modular_bluemoon/sound/voice/expiebark2' = 1)
+	squeak_override = list('modular_bluemoon/sound/voice/expiebark2.ogg' = 1)
 
 /obj/item/toy/plush/bm/oldman
 	name = "Old Man plushie"
