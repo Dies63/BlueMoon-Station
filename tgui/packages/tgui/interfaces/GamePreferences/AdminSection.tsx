@@ -1,15 +1,17 @@
 import { useBackend } from '../../backend';
-import { Button, Dropdown, Slider, Stack, Tooltip } from '../../components';
+import { Button, Dropdown, Input, Slider, Stack, Tooltip } from '../../components';
 
 type AdminData = {
   has_admin: boolean;
   deadmin: number;
+  ticket_nickname: string;
   sound_adminhelp: boolean;
   sound_prayers: boolean;
+  sound_fax: boolean;
   sound_volume_adminhelp: number;
   sound_volume_prayers: number;
-  announce_login: boolean;
-  combohud_lighting: boolean;
+  sound_volume_fax: number;
+  adminhelp_windowflash: boolean;
 };
 
 const DEADMIN_BITS: Record<string, number> = {
@@ -46,7 +48,7 @@ const SoundToggleButton = (props: { enabled: boolean; onClick: () => void }) => 
 
 export const AdminSection = (props) => {
   const { act, data } = useBackend<AdminData>();
-  const { has_admin, deadmin, sound_adminhelp, sound_prayers, sound_volume_adminhelp, sound_volume_prayers, announce_login, combohud_lighting } = data;
+  const { has_admin, deadmin, ticket_nickname, sound_adminhelp, sound_prayers, sound_fax, sound_volume_adminhelp, sound_volume_prayers, sound_volume_fax, adminhelp_windowflash } = data;
 
   if (!has_admin) {
     return null;
@@ -123,36 +125,39 @@ export const AdminSection = (props) => {
         );
       })}
       <Stack.Divider />
-      {renderSoundRow('sound_adminhelp', 'Adminhelp', 'sound_volume_adminhelp', 'Звук, уведомляющий о новом обращении в adminhelp')}
-      {renderSoundRow('sound_prayers', 'Звуки молитв', 'sound_volume_prayers', 'Воспроизводится при молитве божеству или при получении ответа')}
-      <Stack.Divider />
       <Stack.Item>
         <Stack align="center" fill className="GamePreferences__row">
           <Stack.Item grow basis={0}>
-            <div className="GamePreferences__label">Оповещение о входе</div>
-            <div className="GamePreferences__hint">Оповещать о вашем входе в игру (видно в админ-панели)</div>
+            <div className="GamePreferences__label">Никнейм в тикетах</div>
+            <div className="GamePreferences__hint">Отображается игрокам вместо сикея. Оставьте пустым для авто-нумерации (админ_1, админ_2)</div>
           </Stack.Item>
           <Stack.Item>
-            <Button
-              icon={announce_login ? "toggle-on" : "toggle-off"}
-              selected={announce_login}
-              onClick={() => act('toggle_admin', { flag: 'announce_login' })}
+            <Input
+              width="180px"
+              value={ticket_nickname}
+              maxLength={32}
+              placeholder="админ_N"
+              onInput={(e, value) => act('ticket_nickname', { nickname: value })}
             />
           </Stack.Item>
         </Stack>
       </Stack.Item>
+      <Stack.Divider />
+      {renderSoundRow('sound_adminhelp', 'Adminhelp', 'sound_volume_adminhelp', 'Звук, уведомляющий о новом обращении в adminhelp')}
+      {renderSoundRow('sound_prayers', 'Звуки молитв', 'sound_volume_prayers', 'Воспроизводится при молитве божеству или при получении ответа')}
+      {renderSoundRow('sound_fax', 'Звуки факсов', 'sound_volume_fax', 'Звук, уведомляющий о получении нового факса')}
+      <Stack.Divider />
       <Stack.Item>
         <Stack align="center" fill className="GamePreferences__row">
           <Stack.Item grow basis={0}>
-            <div className="GamePreferences__label">Подсветка комбо-HUD</div>
-            <div className="GamePreferences__hint">Режим подсветки комбо-HUD: стандартный или полная яркость</div>
+            <div className="GamePreferences__label">Мигание окна триггерах</div>
+            <div className="GamePreferences__hint">Мигание окна при получении ахелпа, напоминалке тикетов и полученниии факса</div>
           </Stack.Item>
           <Stack.Item>
-            <Dropdown
-              width="150px"
-              options={['Без изменений', 'Полная яркость']}
-              selected={combohud_lighting ? 'Полная яркость' : 'Без изменений'}
-              onSelected={() => act('toggle_admin', { flag: 'combohud_lighting' })}
+            <Button
+              icon={adminhelp_windowflash ? "toggle-on" : "toggle-off"}
+              selected={adminhelp_windowflash}
+              onClick={() => act('toggle_admin', { flag: 'adminhelp_windowflash' })}
             />
           </Stack.Item>
         </Stack>

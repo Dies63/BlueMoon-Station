@@ -25,8 +25,11 @@
 	.["sound_ship_ambience"] = !!(toggles & SOUND_SHIP_AMBIENCE)
 	.["sound_announcements"] = !!(toggles & SOUND_ANNOUNCEMENTS)
 	.["sound_bark"] = !!(toggles & SOUND_BARK)
+	.["sound_emote"] = !!(toggles & SOUND_EMOTE)
 	.["sound_prayers"] = !!(toggles & SOUND_PRAYERS)
 	.["sound_adminhelp"] = !!(toggles & SOUND_ADMINHELP)
+	.["sound_mentorhelp"] = !!(mentor_toggles & SOUND_MENTORHELP)
+	.["sound_fax"] = !!(toggles & SOUND_FAX)
 
 	// Sound volumes
 	.["sound_volume_midi"] = sound_volume_midi
@@ -36,8 +39,12 @@
 	.["sound_volume_bark"] = sound_volume_bark
 	.["sound_volume_prayers"] = sound_volume_prayers
 	.["sound_volume_adminhelp"] = sound_volume_adminhelp
+	.["sound_volume_mentorhelp"] = sound_volume_mentorhelp
+	.["sound_volume_fax"] = sound_volume_fax
 	.["sound_volume_instruments"] = sound_volume_instruments
 	.["sound_volume_jukeboxes"] = sound_volume_jukeboxes
+	.["sound_volume_emote"] = sound_volume_emote
+	.["sound_volume_personal_jukeboxes"] = sound_volume_personal_jukeboxes
 
 	// Graphics toggles
 	.["parallax"] = parallax
@@ -71,6 +78,7 @@
 	.["chat_pullr"] = !!(chat_toggles & CHAT_PULLR)
 	.["chat_bankcard"] = !!(chat_toggles & CHAT_BANKCARD)
 	.["windowflashing"] = windowflashing
+	.["adminhelp_windowflash"] = adminhelp_windowflash
 	.["windownoise"] = windownoise
 	.["mood_vignette"] = mood_vignette
 
@@ -81,10 +89,8 @@
 	.["arrivalrattle"] = !(toggles & DISABLE_ARRIVALRATTLE)
 	.["intent_style"] = !!(toggles & INTENT_STYLE)
 	.["action_buttons_hide"] = action_buttons_hide_on_spawn
-	.["announce_login"] = !!(toggles & ANNOUNCE_LOGIN)
-	.["combohud_lighting"] = !!(toggles & COMBOHUD_LIGHTING)
-	.["tg_player_panel"] = !!(toggles & TG_PLAYER_PANEL)
 	.["autostand"] = autostand
+	.["long_strip_menu"] = long_strip_menu
 
 	// Gameplay: combat
 	.["disable_combat_cursor"] = disable_combat_cursor
@@ -99,6 +105,12 @@
 	.["has_admin"] = !!check_rights_for(user?.client, R_ADMIN)
 	if(.["has_admin"])
 		.["deadmin"] = deadmin
+		.["ticket_nickname"] = ticket_nickname
+
+	// Mentor
+	.["has_mentor"] = !!user?.client?.is_mentor()
+	if(.["has_mentor"])
+		.["dementor_on_login"] = !!(mentor_toggles & DEMENTOR_ON_LOGIN)
 
 	// Antag roles
 	var/list/antag_roles = list()
@@ -140,6 +152,7 @@
 	.["sex_jitter"] = !!(cit_toggles & SEX_JITTER)
 	.["no_disco_dance"] = !(cit_toggles & NO_DISCO_DANCE)
 	.["gfluid_blacklist"] = gfluid_blacklist
+	.["member_public"] = !!(toggles & MEMBER_PUBLIC)
 
 	// Old settings restoration
 	.["outline_color"] = outline_color
@@ -249,11 +262,19 @@
 					toggles ^= SOUND_ANNOUNCEMENTS
 				if("sound_bark")
 					toggles ^= SOUND_BARK
+				if("sound_emote")
+					toggles ^= SOUND_EMOTE
 				if("sound_prayers")
 					toggles ^= SOUND_PRAYERS
 				if("sound_adminhelp")
 					toggles ^= SOUND_ADMINHELP
+				if("sound_mentorhelp")
+					mentor_toggles ^= SOUND_MENTORHELP
+				if("sound_fax")
+					toggles ^= SOUND_FAX
 			save_preferences()
+			tgui_or_html_refresh(user)
+			return TRUE
 
 		// Sound volumes
 		if("set_volume")
@@ -262,6 +283,8 @@
 			if(copytext(flag, 1, 14) == "sound_volume_" && (flag in vars))
 				vars[flag] = value
 				save_preferences()
+			tgui_or_html_refresh(user)
+			return TRUE
 
 		// Graphics toggles
 		if("toggle_gfx")
@@ -305,6 +328,8 @@
 					hud_toggle_flash = !hud_toggle_flash
 				if("mood_vignette")
 					mood_vignette = !mood_vignette
+				if("view_pixelshift")
+					view_pixelshift = !view_pixelshift
 			save_preferences()
 			tgui_or_html_refresh(user)
 
@@ -349,7 +374,10 @@
 					windowflashing = !windowflashing
 				if("windownoise")
 					windownoise = !windownoise
+				if("auto_capitalize_enabled")
+					auto_capitalize_enabled = !auto_capitalize_enabled
 			save_preferences()
+			return TRUE
 
 		// Gameplay toggles
 		if("toggle_gameplay")
@@ -371,19 +399,16 @@
 					toggles ^= INTENT_STYLE
 				if("action_buttons_hide")
 					action_buttons_hide_on_spawn = !action_buttons_hide_on_spawn
-				if("announce_login")
-					toggles ^= ANNOUNCE_LOGIN
-				if("combohud_lighting")
-					toggles ^= COMBOHUD_LIGHTING
-				if("tg_player_panel")
-					toggles ^= TG_PLAYER_PANEL
 				if("autostand")
 					autostand = !autostand
+				if("long_strip_menu")
+					long_strip_menu = !long_strip_menu
 				if("disable_combat_cursor")
 					disable_combat_cursor = !disable_combat_cursor
 				if("disable_combat_mouse_lock")
 					disable_combat_mouse_lock = !disable_combat_mouse_lock
 			save_preferences()
+			return TRUE
 
 		// Antag role toggles
 		if("toggle_antag")
@@ -398,15 +423,20 @@
 				be_special[role] = value
 			save_preferences()
 
+		if("ticket_nickname")
+			var/nickname = params["nickname"]
+			if(istext(nickname))
+				ticket_nickname = copytext_char(nickname, 1, 32)
+			save_preferences()
+			return TRUE
+
 		if("toggle_admin")
 			var/flag = params["flag"]
 			switch(flag)
 				if("sound_adminhelp")
 					toggles ^= SOUND_ADMINHELP
-				if("announce_login")
-					toggles ^= ANNOUNCE_LOGIN
-				if("combohud_lighting")
-					toggles ^= COMBOHUD_LIGHTING
+				if("adminhelp_windowflash")
+					adminhelp_windowflash = !adminhelp_windowflash
 				if("deadmin_play_login")
 					deadmin ^= DEADMIN_ONLOGIN
 				if("deadmin_play_spawn")
@@ -420,6 +450,17 @@
 				if("deadmin_silicon")
 					deadmin ^= DEADMIN_POSITION_SILICON
 			save_preferences()
+			return TRUE
+
+		if("toggle_mentor")
+			if(!usr.client?.is_mentor())
+				return TRUE
+			var/flag = params["flag"]
+			switch(flag)
+				if("dementor_on_login")
+					mentor_toggles ^= DEMENTOR_ON_LOGIN
+			save_preferences()
+			return TRUE
 
 		if("set_screenshake")
 			var/flag = params["flag"]
@@ -460,8 +501,6 @@
 		if("toggle_gfx_val")
 			var/flag = params["flag"]
 			switch(flag)
-				if("view_pixelshift")
-					view_pixelshift = !view_pixelshift
 				if("auto_capitalize_enabled")
 					auto_capitalize_enabled = !auto_capitalize_enabled
 			save_preferences()
@@ -472,10 +511,17 @@
 			switch(flag)
 				if("tgui_input_mode")
 					tgui_input_mode = (value == "TGUI" ? TRUE : FALSE)
+					user.client.ensure_keys_set(src)
 				if("tgui_input_verbs")
 					tgui_input_verbs = (value == "TGUI" ? TRUE : FALSE)
+					user.client.ensure_keys_set(src)
 				if("UI_style")
 					UI_style = value
+					if(user?.hud_used)
+						QDEL_NULL(user.hud_used)
+						user.create_mob_hud()
+						if(user.hud_used)
+							user.hud_used.show_hud(1, user)
 				if("ghost_form")
 					ghost_form = value
 				if("ghost_orbit")
@@ -568,6 +614,8 @@
 					cit_toggles ^= SEX_JITTER
 				if("no_disco_dance")
 					cit_toggles ^= NO_DISCO_DANCE
+				if("member_public")
+					toggles ^= MEMBER_PUBLIC
 			save_preferences()
 
 		// Keybinding actions

@@ -1407,13 +1407,19 @@
 	pH = 5.5
 	molarity = 1
 	condensation_amount = MOLES_GAS_VISIBLE_STEP
+	/// Не смывать намеренное оформление: рисунки/граффити крайонов и WASHABLE-покраску
+	/// (спрейканы, вёдра с краской). Грязь, кровь и прочие декали моются как обычно.
+	var/preserves_decor = FALSE
 
 /datum/reagent/space_cleaner/reaction_obj(obj/O, reac_volume)
 	if(istype(O, /obj/effect/decal/cleanable)  || istype(O, /obj/item/projectile/bullet/reusable/foam_dart) || istype(O, /obj/item/ammo_casing/caseless/foam_dart))
+		if(preserves_decor && istype(O, /obj/effect/decal/cleanable/crayon))
+			return
 		qdel(O)
 	else
 		if(O)
-			O.remove_atom_colour(WASHABLE_COLOUR_PRIORITY)
+			if(!preserves_decor)
+				O.remove_atom_colour(WASHABLE_COLOUR_PRIORITY)
 			SEND_SIGNAL(O, COMSIG_COMPONENT_CLEAN_ACT, CLEAN_WEAK)
 			O.clean_blood()
 			O.wash_cum() //sandstorm edit
@@ -1421,15 +1427,25 @@
 /datum/reagent/space_cleaner/reaction_turf(turf/T, reac_volume)
 	..()
 	if(reac_volume >= 1)
-		T.remove_atom_colour(WASHABLE_COLOUR_PRIORITY)
+		if(!preserves_decor)
+			T.remove_atom_colour(WASHABLE_COLOUR_PRIORITY)
 		SEND_SIGNAL(T, COMSIG_COMPONENT_CLEAN_ACT, CLEAN_WEAK)
 		T.clean_blood()
 		T.wash_cum() //sandstorm edit
 		for(var/obj/effect/decal/cleanable/C in T)
+			if(preserves_decor && istype(C, /obj/effect/decal/cleanable/crayon))
+				continue
 			qdel(C)
 
 		for(var/mob/living/simple_animal/slime/M in T)
 			M.adjustToxLoss(rand(5,10))
+
+// Мягкая пена аварийной очистки станции: ивент моет грязь и кровь, но не уносит
+// покраску баров и библиотек, которую экипаж наносил целый раунд.
+/datum/reagent/space_cleaner/gentle
+	name = "Foaming space cleaner"
+	description = "A gentler cleaning compound that dissolves grime while sparing paint and artwork."
+	preserves_decor = TRUE
 
 /datum/reagent/space_cleaner/reaction_mob(mob/living/M, method=TOUCH, reac_volume, affected_bodypart)
 	if(method == TOUCH || method == VAPOR)
@@ -2456,7 +2472,7 @@
 
 /datum/reagent/romerol/reaction_mob(mob/living/carbon/human/H, method=TOUCH, reac_volume, affected_bodypart)
 	// Silently add the zombie infection organ to be activated upon death
-	if(!H.getorganslot(ORGAN_SLOT_ZOMBIE) && !HAS_TRAIT(H, TRAIT_ROBOTIC_ORGANISM)) // BLUEMOON ADD - добавлена проверка для роботов
+	if(method != TOUCH && !H.getorganslot(ORGAN_SLOT_ZOMBIE) && !HAS_TRAIT(H, TRAIT_ROBOTIC_ORGANISM)) // BLUEMOON ADD - добавлена проверка для роботов
 		var/obj/item/organ/zombie_infection/ZI = new organ_type()
 		ZI.Insert(H)
 	..()
@@ -3062,6 +3078,22 @@
 			M.reagents.del_reagent(/datum/reagent/hairball)
 			return
 	..()
+
+/datum/reagent/nanite_protector
+	name = "Nanite Protector"
+	description = "Серая масса непонятного происхождения. При попадании в организм она необратимо меняет клетки и перестраивает структуры, не давая им взаимодействовать с нанитами."
+	color = "#666666"
+	can_synth = FALSE
+	metabolization_rate = REAGENTS_METABOLISM * 5
+	chemical_flags = REAGENT_ALL_PROCESS
+
+/datum/reagent/nanite_protector/on_mob_add(mob/living/L, amount)
+	. = ..()
+	if(HAS_TRAIT_FROM(L, TRAIT_NANITES_IMMUNITY, NANITES_IMMUNITY_FROM_REAGENT))
+		return
+	ADD_TRAIT(L, TRAIT_NANITES_IMMUNITY, NANITES_IMMUNITY_FROM_REAGENT)
+	SEND_SIGNAL(L, COMSIG_NANITE_DELETE)
+	to_chat(L, "<b>[/datum/quirk/nanites_immunity::gain_text]</b>")
 
 /datum/reagent/red_ichor
 	name = "Red Ichor"

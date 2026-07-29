@@ -1,5 +1,5 @@
 
-/obj/item/bodypart/proc/can_dismember(obj/item/I)
+/obj/item/bodypart/proc/can_dismembered()
 	if(dismemberable)
 		return TRUE
 
@@ -22,7 +22,8 @@
 	if(!harmless)
 		C.emote("realagony")
 		SEND_SIGNAL(C, COMSIG_ADD_MOOD_EVENT, "dismembered", /datum/mood_event/dismembered)
-	else C.emote("pain")
+	else
+		C.emote("pain")
 	drop_limb()
 	C.update_equipment_speed_mods() // Update in case speed affecting item unequipped by dismemberment
 
@@ -110,6 +111,9 @@
 		W.remove_wound(TRUE)
 
 	owner = null
+	bleed_overlay_icon = null
+	C.update_wound_overlays()
+	C.update_bandage_overlays()
 
 	for(var/X in C.surgeries) //if we had an ongoing surgery on that limb, we stop it.
 		var/datum/surgery/S = X
@@ -189,6 +193,7 @@
   * * bare_wound_bonus: ditto above
   */
 /obj/item/bodypart/proc/try_dismember(wounding_type, wounding_dmg, wound_bonus, bare_wound_bonus)
+	. = FALSE
 	if(wounding_dmg < DISMEMBER_MINIMUM_DAMAGE)
 		return
 
@@ -200,9 +205,7 @@
 		return
 
 	var/datum/wound/loss/dismembering = new
-	dismembering.apply_dismember(src, wounding_type)
-
-	return TRUE
+	return dismembering.apply_dismember(src, wounding_type)
 
 //when a limb is dropped, the internal organs are removed from the mob and put into the limb
 /obj/item/organ/proc/transfer_to_limb(obj/item/bodypart/LB, mob/living/carbon/C)
@@ -373,6 +376,7 @@
 	C.update_body(FALSE, TRUE) // again block recursive calls because dullahans will try update their icons by regenerating their head
 	C.update_hair()
 	C.update_damage_overlays()
+	C.update_wound_overlays()
 	C.update_mobility()
 
 /obj/item/bodypart/head/attach_limb(mob/living/carbon/C, special)

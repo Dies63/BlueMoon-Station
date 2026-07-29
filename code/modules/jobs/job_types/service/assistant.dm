@@ -37,6 +37,7 @@ Assistant
 		"Crewmate",
 		"Cumdump",
 		"Diplomat",
+		"Defense Attorney",
 		"Freelancer",
 		"Freeloader",
 		"Greytider",
@@ -102,6 +103,7 @@ Assistant
 
 	uniform = /obj/item/clothing/under/rank/civilian/util
 
+	no_custom_backpack = TRUE
 	backpack = /obj/item/storage/backpack/duffelbag/syndie
 	satchel = /obj/item/storage/backpack/duffelbag/syndie
 	duffelbag = /obj/item/storage/backpack/duffelbag/syndie
@@ -116,7 +118,7 @@ Assistant
 	if (CONFIG_GET(flag/grey_assistants))
 		uniform = suited ? /obj/item/clothing/under/color/grey : /obj/item/clothing/under/color/jumpskirt/grey
 	else
-		if(SSevents.holidays && SSevents.holidays[PRIDE_MONTH])
+		if(SSholidays.holidays && SSholidays.holidays[PRIDE_MONTH])
 			uniform = suited ? /obj/item/clothing/under/color/rainbow : /obj/item/clothing/under/color/jumpskirt/rainbow
 		else
 			uniform = suited ? /obj/item/clothing/under/color/random : /obj/item/clothing/under/color/jumpskirt/random

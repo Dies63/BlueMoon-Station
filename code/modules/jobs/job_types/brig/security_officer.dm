@@ -16,15 +16,20 @@
 	alt_titles = list(
 		"Gorlex Marauders Trainee", //Триглав выше, для удобства
 		"Combatant", //Синди выше, для удобства
+		"Training Officer", //Инструктор выше, для удобства
+		"Security Training Officer", //Инструктор выше, для удобства
+		"Field Training Officer", //Инструктор выше, для удобства
 		"AC Specialist",
 		"Cerberus",
 		"Civil Protection",
 		"Defense Contractor",
+		"Deputy Sheriff",
 		"Explosives Specialist",
 		"Guard",
 		"Guardsman",
 		"Police Officer",
 		"Probation Officer",
+		"Parole Officer",
 		"Riot Control Officer",
 		"SAARE Operator",
 		"Safeguard Agent",
@@ -201,6 +206,7 @@ GLOBAL_LIST_INIT(available_depts, list(SEC_DEPT_ENGINEERING, SEC_DEPT_MEDICAL, S
 						/obj/item/gun/ballistic/automatic/pistol/enforcer/nomag,
 						/obj/item/ammo_box/magazine/e45/taser=3, /obj/item/syndicate_uplink/station=1)
 
+	no_custom_backpack = TRUE
 	backpack = /obj/item/storage/backpack/duffelbag/syndie/ammo
 	satchel = /obj/item/storage/backpack/duffelbag/syndie/ammo
 	duffelbag = /obj/item/storage/backpack/duffelbag/syndie/ammo

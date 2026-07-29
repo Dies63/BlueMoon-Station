@@ -202,6 +202,7 @@
 	add_capacitor()
 	START_PROCESSING(SSobj, src)
 	GLOB.poi_list |= src
+	AddComponent(/datum/component/hostile_machine_registry)
 	log_message("[src.name] created.", LOG_MECHA)
 	GLOB.mechas_list += src //global mech list
 	prepare_huds()
@@ -597,10 +598,7 @@
 		if(!target)
 			return
 	var/mob/living/L = user
-	if(selected)
-		if(!(L in return_controllers_with_flag(VEHICLE_CONTROL_EQUIPMENT)))
-			to_chat(user, "You can't control mech equipment from here!")
-			return
+	if(selected && (L in return_controllers_with_flag(VEHICLE_CONTROL_EQUIPMENT)))
 		if(!Adjacent(target) && (selected.range & MECHA_RANGED))
 			if(HAS_TRAIT(L, TRAIT_PACIFISM) && selected.harmful)
 				to_chat(L, "<span class='warning'>You don't want to harm other living beings!</span>")
@@ -1005,6 +1003,9 @@
 	LAZYREMOVE(occupants, pilot_mob)
 	if(pilot_mob.mecha == src)
 		pilot_mob.mecha = null
+	//пилот-контроллер водил мех мув-лупами SSai_movement: без пилота лупы
+	//не нужны на любом пути выхода (эвакуация, смерть, гиб)
+	SSmove_manager.stop_looping(src, SSai_movement)
 	pilot_mob.forceMove(get_turf(src))
 	update_icon()
 

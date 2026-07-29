@@ -1,3 +1,25 @@
+/// A cost counter for resumable, repeating processes (Paradise port).
+/// The MC's per-fire cost average hides the true length of a multi-tick pass:
+/// a phase that sleeps across 8 ticks reports 8 small slices instead of one
+/// real total. record_progress() accumulates slices until the pass finishes.
+/datum/resumable_cost_counter
+	var/last_complete_ms = 0
+	var/ongoing_ms = 0
+
+/// Updates the counter based on the time spent making progress and whether the task finished.
+/datum/resumable_cost_counter/proc/record_progress(cost_ms, finished)
+	if(finished)
+		last_complete_ms = ongoing_ms + cost_ms
+		ongoing_ms = 0
+	else
+		ongoing_ms += cost_ms
+
+/// Display string: last completed pass total, or "<n>+" while an even longer pass is in progress.
+/datum/resumable_cost_counter/proc/to_string()
+	if(ongoing_ms > last_complete_ms)
+		return "[round(ongoing_ms, 1)]+"
+	return "[round(last_complete_ms, 1)]"
+
 SUBSYSTEM_DEF(air)
 	name = "Atmospherics"
 	init_order = INIT_ORDER_AIR
@@ -7,6 +29,12 @@ SUBSYSTEM_DEF(air)
 	runlevels = RUNLEVEL_GAME | RUNLEVEL_POSTGAME
 
 	var/cached_cost = 0
+
+	/// Wall-clock cost of one FULL pass through every SSair phase, accumulated
+	/// across all the ticks the pass was resumed over. The MC cost column only
+	/// shows per-fire slice averages, which systematically understate a pass
+	/// that yields a lot.
+	var/datum/resumable_cost_counter/cost_full = new()
 
 	var/cost_turfs = 0
 	var/cost_groups = 0
@@ -55,6 +83,9 @@ SUBSYSTEM_DEF(air)
 	var/list/gas_reactions = list()
 	var/list/atmos_gen
 	var/list/planetary = list()
+	/// Разобранные строки газа: сырая строка -> list(температура, list(газ -> моли)).
+	/// См. [/datum/controller/subsystem/air/proc/get_parsed_gas_string].
+	var/list/parsed_gas_strings = list()
 	//Special functions lists
 	var/list/turf/open/high_pressure_delta = list()
 
@@ -94,6 +125,7 @@ SUBSYSTEM_DEF(air)
 	excited_group_pressure_goal = excited_group_pressure_goal_target
 
 /datum/controller/subsystem/air/stat_entry(msg)
+	msg += "FC:[cost_full.to_string()]мс "
 	msg += "C:{HP:[round(cost_highpressure,1)]|HS:[round(cost_hotspots,1)]|HE:[round(heat_process_time(),1)]|SC:[round(cost_superconductivity,1)]|PN:[round(cost_pipenets,1)]|AM:[round(cost_atmos_machinery,1)]} TC:{AT:[round(cost_turfs,1)]|EG:[round(cost_groups,1)]|EQ:[round(cost_equalize,1)]|PO:[round(cost_post_process,1)]}TH:[round(thread_wait_ticks,1)]|HS:[hotspots.len]|PN:[networks.len]|HP:[high_pressure_delta.len]|HT:[high_pressure_turfs]|LT:[low_pressure_turfs]|ET:[num_equalize_processed]|GT:[num_group_turfs_processed]|GA:[gas_mixes_count]|MG:[gas_mixes_allocated]"
 	return ..()
 
@@ -227,6 +259,7 @@ SUBSYSTEM_DEF(air)
 			cached_cost = 0
 		process_rebuild_queue(resumed)
 		cached_cost += TICK_USAGE_REAL - timer
+		cost_full.record_progress(TICK_DELTA_TO_MS(TICK_USAGE_REAL - timer), FALSE)
 		if(state != SS_RUNNING)
 			return
 		cost_rebuilds = MC_AVERAGE(cost_rebuilds, TICK_DELTA_TO_MS(cached_cost))
@@ -239,6 +272,7 @@ SUBSYSTEM_DEF(air)
 			cached_cost = 0
 		process_pipenets(resumed)
 		cached_cost += TICK_USAGE_REAL - timer
+		cost_full.record_progress(TICK_DELTA_TO_MS(TICK_USAGE_REAL - timer), FALSE)
 		if(state != SS_RUNNING)
 			return
 		cost_pipenets = MC_AVERAGE(cost_pipenets, TICK_DELTA_TO_MS(cached_cost))
@@ -251,6 +285,7 @@ SUBSYSTEM_DEF(air)
 			cached_cost = 0
 		process_atmos_machinery(resumed)
 		cached_cost += TICK_USAGE_REAL - timer
+		cost_full.record_progress(TICK_DELTA_TO_MS(TICK_USAGE_REAL - timer), FALSE)
 		if(state != SS_RUNNING)
 			return
 		resumed = 0
@@ -263,6 +298,7 @@ SUBSYSTEM_DEF(air)
 			cached_cost = 0
 		process_turfs(resumed)
 		cached_cost += TICK_USAGE_REAL - timer
+		cost_full.record_progress(TICK_DELTA_TO_MS(TICK_USAGE_REAL - timer), FALSE)
 		if(state != SS_RUNNING)
 			return
 		cost_turfs = MC_AVERAGE(cost_turfs, TICK_DELTA_TO_MS(cached_cost))
@@ -275,6 +311,7 @@ SUBSYSTEM_DEF(air)
 			cached_cost = 0
 		process_turf_equalize(resumed)
 		cached_cost += TICK_USAGE_REAL - timer
+		cost_full.record_progress(TICK_DELTA_TO_MS(TICK_USAGE_REAL - timer), FALSE)
 		if(state != SS_RUNNING)
 			return
 		cost_equalize = MC_AVERAGE(cost_equalize, TICK_DELTA_TO_MS(cached_cost))
@@ -287,6 +324,7 @@ SUBSYSTEM_DEF(air)
 			cached_cost = 0
 		process_excited_groups(resumed)
 		cached_cost += TICK_USAGE_REAL - timer
+		cost_full.record_progress(TICK_DELTA_TO_MS(TICK_USAGE_REAL - timer), FALSE)
 		if(state != SS_RUNNING)
 			return
 		cost_groups = MC_AVERAGE(cost_groups, TICK_DELTA_TO_MS(cached_cost))
@@ -299,6 +337,7 @@ SUBSYSTEM_DEF(air)
 			cached_cost = 0
 		finish_turf_processing(resumed)
 		cached_cost += TICK_USAGE_REAL - timer
+		cost_full.record_progress(TICK_DELTA_TO_MS(TICK_USAGE_REAL - timer), FALSE)
 		if(state != SS_RUNNING)
 			return
 		cost_post_process = MC_AVERAGE(cost_post_process, TICK_DELTA_TO_MS(cached_cost))
@@ -311,6 +350,7 @@ SUBSYSTEM_DEF(air)
 			cached_cost = 0
 		process_high_pressure_delta(resumed)
 		cached_cost += TICK_USAGE_REAL - timer
+		cost_full.record_progress(TICK_DELTA_TO_MS(TICK_USAGE_REAL - timer), FALSE)
 		if(state != SS_RUNNING)
 			return
 		cost_highpressure = MC_AVERAGE(cost_highpressure, TICK_DELTA_TO_MS(cached_cost))
@@ -323,21 +363,31 @@ SUBSYSTEM_DEF(air)
 			cached_cost = 0
 		process_hotspots(resumed)
 		cached_cost += TICK_USAGE_REAL - timer
+		cost_full.record_progress(TICK_DELTA_TO_MS(TICK_USAGE_REAL - timer), FALSE)
 		if(state != SS_RUNNING)
 			return
 		cost_hotspots = MC_AVERAGE(cost_hotspots, TICK_DELTA_TO_MS(cached_cost))
 		resumed = 0
+		if(!heat_enabled)
+			cost_full.record_progress(0, TRUE) // full pass completed
 		currentpart = heat_enabled ? SSAIR_TURF_CONDUCTION : SSAIR_REBUILD_PIPENETS
 
 	// Heat -- slow and of questionable usefulness. Off by default for this reason. Pretty cool, though.
 	if(currentpart == SSAIR_TURF_CONDUCTION)
 		timer = TICK_USAGE_REAL
+		if(!resumed)
+			cached_cost = 0
 		if(process_turf_heat(TICK_REMAINING_MS))
 			pause()
-		cost_superconductivity = MC_AVERAGE(cost_superconductivity, TICK_DELTA_TO_MS(TICK_USAGE_REAL - timer))
+		// accumulate across resumes: a multi-tick conduction pass must average
+		// its full cost, not just the final (usually tiny) slice
+		cached_cost += TICK_USAGE_REAL - timer
+		cost_full.record_progress(TICK_DELTA_TO_MS(TICK_USAGE_REAL - timer), FALSE)
 		if(state != SS_RUNNING)
 			return
+		cost_superconductivity = MC_AVERAGE(cost_superconductivity, TICK_DELTA_TO_MS(cached_cost))
 		resumed = 0
+		cost_full.record_progress(0, TRUE) // full pass completed
 		currentpart = SSAIR_REBUILD_PIPENETS
 
 /datum/controller/subsystem/air/proc/process_rebuild_queue(resumed = FALSE)
@@ -591,9 +641,46 @@ SUBSYSTEM_DEF(air)
 
 /datum/controller/subsystem/air/proc/generate_atmos()
 	atmos_gen = list()
+	// Строки генераторов теперь другие, разобранные значения протухли.
+	parsed_gas_strings = list()
 	for(var/T in subtypesof(/datum/atmosphere))
 		var/datum/atmosphere/atmostype = T
 		atmos_gen[initial(atmostype.id)] = new atmostype
+
+/**
+ * Разбор строки газа с кэшем по самой строке.
+ *
+ * Карта раздаёт всего пару десятков уникальных initial_gas_mix, а
+ * parse_gas_string зовётся один раз на каждый открытый турф - это сотни тысяч
+ * прогонов params2list/text2num за старт мира на одних и тех же строках.
+ * Строки генераторов (atmos_gen) фиксируются один раз за раунд в
+ * /datum/atmosphere/New, так что соответствие "строка -> смесь" стабильно.
+ *
+ * Возвращает list(GAS_STRING_TEMP = температура или null, GAS_STRING_MOLES = list(газ -> моли)).
+ * Список общий на всех вызывающих - менять его нельзя, только читать.
+ */
+/datum/controller/subsystem/air/proc/get_parsed_gas_string(gas_string)
+	if(!gas_string)
+		gas_string = "" // пустая смесь, заодно не индексируем список по null
+	var/list/cached = parsed_gas_strings[gas_string]
+	if(cached)
+		return cached
+
+	var/list/gas = params2list(preprocess_gas_string(gas_string))
+	var/temperature = null
+	if(gas["TEMP"])
+		temperature = text2num(gas["TEMP"])
+		gas -= "TEMP"
+		if(!isnum(temperature) || temperature < TCMB)
+			temperature = TCMB
+	var/list/moles = list()
+	for(var/id in gas)
+		moles[id] = text2num(gas[id])
+
+	cached = list(GAS_STRING_TEMP = temperature, GAS_STRING_MOLES = moles)
+	if(length(parsed_gas_strings) < GAS_STRING_CACHE_LIMIT)
+		parsed_gas_strings[gas_string] = cached
+	return cached
 
 /datum/controller/subsystem/air/proc/preprocess_gas_string(gas_string)
 	if(!atmos_gen)
@@ -632,8 +719,10 @@ SUBSYSTEM_DEF(air)
 
 ///Removes a machine from the heartbeat queue (Destroy: the queue holds a strong ref).
 /datum/controller/subsystem/air/proc/dequeue_idle_machine(obj/machinery/atmospherics/machine)
-	if(!machine.atmos_idle_queued)
-		return
+	//Безусловно: флаг и очередь умеют расходиться (atmos_wake() возвращает машину
+	//в обработку, не трогая её запись), а ранний выход по флагу оставлял бы
+	//хардреф на удалённую машину. Проц зовётся только из Destroy - O(n) снятие
+	//ключа тут не в горячем пути.
 	machine.atmos_idle_queued = FALSE
 	atmos_idle_queue -= machine
 

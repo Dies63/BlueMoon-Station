@@ -42,6 +42,10 @@ GLOBAL_LIST_EMPTY(station_turfs)
 	/// If there's a tile over a basic floor that can be ripped out
 	var/overfloor_placed = FALSE
 
+	///ухо спатиал-грида, назначенное на этот турф текущим запросом
+	///get_hearers_in_view(); живёт только внутри одного вызова
+	var/mob/oranges_ear/assigned_oranges_ear
+
 /turf/vv_edit_var(var_name, new_value)
 	var/static/list/banned_edits = list("x", "y", "z")
 	if(var_name in banned_edits)
@@ -347,6 +351,8 @@ GLOBAL_LIST_EMPTY(station_turfs)
 		firstbump = src
 	if(firstbump)
 		mover.Bump(firstbump)
+		if(QDELETED(mover) || mover.loc != oldloc)
+			return FALSE
 		return (mover.movement_type & PHASING)
 	return TRUE
 
@@ -354,10 +360,12 @@ GLOBAL_LIST_EMPTY(station_turfs)
 	. = ..()
 	if(!. || QDELETED(mover))
 		return FALSE
-	for(var/i in contents)
-		if(i == mover)
+	// Only atoms that declare blocks_exit_checks can refuse an exit. Skipping the
+	// rest matters because this loop used to run Uncross() on every single thing
+	// standing in the turf - 553k calls in 78 seconds of a crowded round.
+	for(var/atom/movable/thing as anything in contents)
+		if(thing == mover || !thing.blocks_exit_checks)
 			continue
-		var/atom/movable/thing = i
 		if(!thing.Uncross(mover, newloc))
 			if(thing.flags_1 & ON_BORDER_1)
 				mover.Bump(thing)
